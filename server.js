@@ -26,7 +26,6 @@ app.use(
     credentials: true,
   })
 );
-// app.use(cors({ origin: 'https://www.greenwoodsy.com', credentials: true }));
 
 
 // Routes
