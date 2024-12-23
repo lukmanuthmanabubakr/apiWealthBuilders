@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 
 app.use(
   cors({
-    origin: ['https://www.greenwoodsy.com', 'http://localhost:3000', 'https://api.greenwoodsy.com'],
+    origin: ['https://apiwealthbuilders.vercel.app', 'http://localhost:3000', 'https://apiwealthbuilders.vercel.app'],
     credentials: true,
   })
 );
