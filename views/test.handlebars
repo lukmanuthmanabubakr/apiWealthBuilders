@@ -1,0 +1,103 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+       <style>
+      body {
+        background-color: #f0f0f0; /* Light Gray */
+        padding: 30px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .container {
+        background-color: #2f4f4f; /* Dark Gray */
+        padding: 10px;
+        border-radius: 3px;
+      }
+      .color-primary {
+        color: #4682b4; /* Steel Blue */
+      }
+      .color-danger {
+        color: #1e90ff; /* Dodger Blue */
+      }
+      .color-success {
+        color: #87ea88; /* Light Green */
+      }
+      .color-white {
+        color: #125699; /* White */
+      }
+      .color-blue {
+        color: #125699; /* Dark Navy Blue */
+      }
+      a {
+        font-size: 1.4rem;
+        text-decoration: none;
+      }
+      .btn {
+        font-size: 1.4rem;
+        font-weight: 400;
+        padding: 6px 8px;
+        margin: 0 5px 0 0;
+        border: 1px solid transparent;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+      .btn-primary {
+        color: #ffffff; /* White */
+        background: #4682b4; /* Steel Blue */
+      }
+      .btn-secondary {
+        color: #ffffff; /* White */
+        border: 1px solid #ffffff; /* White */
+        background: transparent;
+      }
+      .btn-danger {
+        color: #ffffff; /* White */
+        background: #1e90ff; /* Dodger Blue */
+      }
+      .btn-success {
+        color: #ffffff; /* White */
+        background: #4682b4; /* Light Green */
+      }
+      .flex-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .logo {
+        padding: 5px;
+        background-color: #f0f7f4; /* Light Gray */
+      }
+      .my {
+        margin: 2rem 0;
+      }
+      .hello {
+        color: #f0f7f4; /* Light Gray */
+      }
+      strong {
+        color: #4682b4; /* Light Green */
+      }
+      p {
+        color: #f0f7f4; /* Light Gray */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo flex-center">
+        <h2 class="color-white">GreenWood</h2>
+      </div>
+      <h2>Hello <span class="color-danger">{{name}}</span></h2>
+      <p>Please use the url below to verify your account</p>
+      <p>This link is valid for 24hrs</p>
+
+      <a href={{link}} class="btn btn-success">Verify Account</a>
+
+      <div class="my">
+        <p>Regards...</p>
+        <p><b class="color-danger">GreenWood</b> Team</p>
+      </div>
+    </div>
+  </body>
+</html>
