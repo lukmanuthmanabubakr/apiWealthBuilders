@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 
 app.use(
   cors({
-    origin: ['https://wealthbuilders-beige.vercel.app', 'http://localhost:3000', 'https://apiwealthbuilders.vercel.app'],
+    origin: ['https://www.wealtybuilders.com', 'http://localhost:3000', 'https://api.wealtybuilders.com'],
     credentials: true,
   })
 );
