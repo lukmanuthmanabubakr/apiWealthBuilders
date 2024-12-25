@@ -833,7 +833,7 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
 });
 
 const getUserTransactions = async (req, res) => {
-  const userId = req.user._id; // Assuming req.user is populated from auth middleware
+  const userId = req.user._id; 
   try {
     const transactions = await Transaction.find({ userId }).populate(
       "userId",
