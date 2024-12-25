@@ -76,10 +76,16 @@
         color: #f0f7f4; /* Light Gray */
       }
       strong {
-        color: #4682b4; /* Light Green */
+        color: #f0f7f4; /* Light Green */
       }
       p {
         color: #f0f7f4; /* Light Gray */
+      }
+      .days{
+        color: #f0f7f4;
+      }
+      li{
+        list-style-type: none;
       }
     </style>
   </head>
@@ -100,7 +106,7 @@
           <span class="color-danger">{{startDate}}</span></li>
         <li><strong>Plan Duration:</strong>
           <span class="color-danger">{{investmentDurationDays}}</span>
-          days</li>
+          <span class="days">days</span></li>
         <li><strong>Investment Profit Date:</strong>
           <span class="color-danger">{{maturityDate}}</span></li>
         <li><strong>Profit Amount (including interest):</strong>
