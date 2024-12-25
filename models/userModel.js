@@ -28,8 +28,12 @@ const userSchema = mongoose.Schema(
     },
     phone: {
       type: String,
-      default: "+1",
+      required: [true, "Please add a phone number"],
+      unique: true,
+      trim: true,
+      match: [/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"],
     },
+
     bio: {
       type: String,
       default: "bio",

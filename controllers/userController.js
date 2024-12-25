@@ -21,10 +21,10 @@ const generateReferralCode = (userId) => {
 
 //To Register User
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, referralCode } = req.body;
+  const { name, email, password, referralCode, phone } = req.body;
 
   // Validation
-  if (!name || !email || !password) {
+  if (!name || !email || !password || !phone) {
     res.status(400);
     throw new Error("Please fill in all the required fields.");
   }
@@ -41,6 +41,12 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Email already in use.");
   }
+  const phoneExist = await User.findOne({ phone });
+
+  if (phoneExist) {
+    res.status(400);
+    throw new Error("Phone Number already in use.");
+  }
 
   // Get UserAgent
   const ua = parser(req.headers["user-agent"]);
@@ -50,6 +56,7 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     email,
     password,
+    phone,
     userAgent,
     balance: 5,
     referralCode: generateReferralCode(email),
