@@ -25,6 +25,9 @@ const sendWithdrawalApprovalEmail = async (
     tls: {
       rejectUnauthorized: false,
     },
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 10,
   });
 
   const handlebarsOptions = {
