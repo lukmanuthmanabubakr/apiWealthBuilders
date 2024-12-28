@@ -3,7 +3,7 @@ const PaymentLog = require("../models/paymentLogModel");
 const User = require("../models/userModel"); // User model for validation
 const sendEmail = require("../utils/sendEmail");
 const asyncHandler = require("express-async-handler");
-const { sendPaymentConfirmationEmail } = require("../services/emailService");
+const { sendPaymentConfirmationEmail, sendPaymentRejectionEmail } = require("../services/emailService");
 
 const createTransaction = asyncHandler(async (req, res) => {
   const { amount } = req.body;
@@ -192,6 +192,67 @@ const viewPaymentStatus = asyncHandler(async (req, res) => {
   });
 });
 
+const rejectPayment = asyncHandler(async (req, res) => {
+  try {
+    const { transactionId, status, notes } = req.body;
+
+    // Ensure the status is valid before proceeding
+    const validStatuses = ["Pending", "Confirmed", "Rejected"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status provided." });
+    }
+
+    // Check if the transaction exists
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found." });
+    }
+
+    // Check if the transaction is still pending before rejecting
+    if (transaction.status !== "Pending") {
+      return res.status(400).json({
+        message: "Transaction has already been confirmed or rejected.",
+      });
+    }
+
+    // Update the transaction status to "Rejected"
+    transaction.status = status;
+    await transaction.save();
+
+    // Create a payment log entry to track the rejection
+    const paymentLog = new PaymentLog({
+      transaction: transaction._id,
+      amount: transaction.amount,
+      status: status === "Pending" ? "pending" : status.toLowerCase(), // Ensure status is in lowercase for PaymentLog
+      adminConfirmation: false,
+      notes: notes || "", // Include notes if provided
+    });
+
+    // Save the payment log
+    await paymentLog.save();
+
+    // Get the user details for email notification
+    const user = await User.findById(transaction.user);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Send an email notification to the user
+    await sendPaymentRejectionEmail(user, transaction, notes);
+
+    // Return success response to the admin
+    return res.status(200).json({
+      message: "Payment rejected successfully.",
+      paymentLog,
+    });
+  } catch (error) {
+    console.error("Error rejecting payment:", error);
+    return res.status(500).json({ message: "Failed to reject payment." });
+  }
+});
+
+
+
 
 
 
@@ -199,5 +260,6 @@ module.exports = {
   createTransaction, // User creates transactions
   confirmPayment, 
   viewPaymentStatus,
-  getPendingTransactions
+  getPendingTransactions,
+  rejectPayment
 };

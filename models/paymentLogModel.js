@@ -13,7 +13,7 @@ const paymentLogSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "failed"], // Status of the payment
+      enum: ["pending", "confirmed", "rejected"], // Status of the payment
       default: "pending", // Default status is pending
     },
     adminConfirmation: {
