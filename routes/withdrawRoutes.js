@@ -5,6 +5,7 @@ const {
   approveWithdrawalRequest,
   getUserWithdrawalHistory,
   getWithdrawalById,
+  rejectWithdrawalRequest,
 } = require("../controllers/withdrawController");
 const {
   protect,
@@ -27,6 +28,8 @@ router.get(
 
 // Route for admin to approve/reject a withdrawal request
 router.put("/approve/:id", protect, adminOnly, approveWithdrawalRequest);
+router.put("/reject/:id", protect, adminOnly, rejectWithdrawalRequest);
+
 
 // Route for admin to view all pending withdrawals
 router.get("/pending", protect, adminOnly, getPendingWithdrawals);

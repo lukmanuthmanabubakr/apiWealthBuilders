@@ -119,7 +119,7 @@ const approveWithdrawalRequest = asyncHandler(async (req, res) => {
 
   try {
     // Use the sendWithdrawalApprovalEmail function to send approval email
-    await sendWithdrawalApprovalEmail(
+    await sendWithdrawalApprovalEmail.sendWithdrawalApprovalEmail(
       subject,
       send_to,
       sent_from,
@@ -135,6 +135,104 @@ const approveWithdrawalRequest = asyncHandler(async (req, res) => {
     throw new Error("Failed to send approval email.");
   }
 });
+
+//Reject Approval
+// const rejectWithdrawalRequest = asyncHandler(async (req, res) => {
+//   const { id } = req.params;
+//   const withdrawal = await Withdrawal.findById(id).populate("user");
+
+//   if (!withdrawal || withdrawal.status !== "Pending") {
+//     return res
+//       .status(404)
+//       .json({ message: "Withdrawal request not found or already processed." });
+//   }
+
+//   // Mark withdrawal as rejected
+//   withdrawal.status = "Rejected";
+//   await withdrawal.save();
+
+//   // Send email to user notifying withdrawal rejection
+//   const subject = "Withdrawal Rejected";
+//   const send_to = withdrawal.user.email;
+//   const sent_from = process.env.EMAIL_USER;
+//   const reply_to = "noreply@yourdomain.com"; 
+//   const template = "withdrawalRejection";  // Assuming you have a template for rejection
+//   const name = withdrawal.user.name;
+//   const walletAddress = withdrawal.walletAddress;
+//   const amount = withdrawal.amount;
+
+//   try {
+//     // Use the sendWithdrawalRejectionEmail function to send rejection email
+//     await sendWithdrawalApprovalEmail.sendWithdrawalRejectionEmail(
+//       subject,
+//       send_to,
+//       sent_from,
+//       reply_to,
+//       template,
+//       name,
+//       walletAddress,
+//       amount
+//     );
+//     res.status(200).json({ message: "Withdrawal rejected and user notified." });
+//   } catch (error) {
+//     res.status(500);
+//     throw new Error("Failed to send rejection email.");
+//   }
+// });
+
+
+const rejectWithdrawalRequest = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const withdrawal = await Withdrawal.findById(id).populate("user");
+
+  if (!withdrawal || withdrawal.status !== "Pending") {
+    return res
+      .status(404)
+      .json({ message: "Withdrawal request not found or already processed." });
+  }
+
+  // Restore the amount to the user's totalMaturityAmount
+  const user = withdrawal.user;
+  user.totalMaturityAmount += withdrawal.amount;
+  await user.save();
+
+  // Mark withdrawal as rejected
+  withdrawal.status = "Rejected";
+  await withdrawal.save();
+
+  // Send email to user notifying withdrawal rejection
+  const subject = "Withdrawal Rejected";
+  const send_to = user.email;
+  const sent_from = process.env.EMAIL_USER;
+  const reply_to = "noreply@yourdomain.com";
+  const template = "withdrawalRejection"; // Assuming you have a template for rejection
+  const name = user.name;
+  const walletAddress = withdrawal.walletAddress;
+  const amount = withdrawal.amount;
+
+  try {
+    // Use the sendWithdrawalRejectionEmail function to send rejection email
+    await sendWithdrawalApprovalEmail.sendWithdrawalRejectionEmail(
+      subject,
+      send_to,
+      sent_from,
+      reply_to,
+      template,
+      name,
+      walletAddress,
+      amount
+    );
+
+    res
+      .status(200)
+      .json({ message: "Withdrawal rejected, balance restored, and user notified." });
+  } catch (error) {
+    res.status(500);
+    throw new Error("Failed to send rejection email.");
+  }
+});
+
+
 
 // Fetch pending withdrawal requests for admin
 const getPendingWithdrawals = asyncHandler(async (req, res) => {
@@ -178,4 +276,5 @@ module.exports = {
   approveWithdrawalRequest,
   getPendingWithdrawals,
   getUserWithdrawalHistory,
+  rejectWithdrawalRequest
 };
