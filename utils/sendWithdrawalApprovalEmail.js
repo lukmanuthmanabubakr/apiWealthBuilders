@@ -93,11 +93,6 @@ const sendWithdrawalRejectionEmail = async (
     tls: {
       rejectUnauthorized: false,
     },
-    pool: true,
-    maxConnections: 10,
-    maxMessages: 50,
-    logger: true,
-    debug: true, 
   });
 
   const handlebarsOptions = {

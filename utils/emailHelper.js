@@ -12,11 +12,6 @@ const sendEmailWithAttachment = async ({ to, subject, text, attachmentPath, atta
         tls: {
           rejectUnauthorized: false,
         },
-        pool: true,
-        maxConnections: 10,
-        maxMessages: 50,
-        logger: true,
-        debug: true, 
       });
 
     await transporter.sendMail({
