@@ -26,8 +26,10 @@ const sendWithdrawalApprovalEmail = async (
       rejectUnauthorized: false,
     },
     pool: true,
-    maxConnections: 5,
-    maxMessages: 10,
+    maxConnections: 10,
+    maxMessages: 50,
+    logger: true,
+    debug: true, 
   });
 
   const handlebarsOptions = {
@@ -92,8 +94,10 @@ const sendWithdrawalRejectionEmail = async (
       rejectUnauthorized: false,
     },
     pool: true,
-    maxConnections: 5,
-    maxMessages: 10,
+    maxConnections: 10,
+    maxMessages: 50,
+    logger: true,
+    debug: true, 
   });
 
   const handlebarsOptions = {
