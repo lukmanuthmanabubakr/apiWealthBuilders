@@ -23,7 +23,8 @@
       justify-content: center; align-items: center; } .logo { padding: 5px;
       background-color: #f0f7f4; /* Light Gray */ } .my { margin: 2rem 0; }
       .hello { color: #f0f7f4; /* Light Gray */ } strong { color: #4682b4; /*
-      Light Green */ } p { color: #f0f7f4; /* Light Gray */ }
+      Light Green */ } p { color: #f0f7f4; /* Light Gray */ } .button-container
+      { text-align: center; margin-top: 20px; }
     </style>
   </head>
   <body>
@@ -37,13 +38,23 @@
         <span class="color-danger">${{amount}}</span>
         has been Declined.</p>
       <p>Please Contact support for more information</p>
+      <p class="consu">
+        For further assistance or inquiries, please feel free to contact our
+        support team.
+      </p>
       <p>Transaction ID: <span class="color-danger">{{transactionId}}</span></p>
+      <div class="button-container">
+        <a
+          href="https://www.wealthbuilders.com/contact"
+          class="btn btn-primary"
+        >Contact Support</a>
+      </div>
 
-      {{! <p>Click the button below to view the details of your transaction:</p> }}
-      {{!-- <a
+      <p>Click the button below to view the details of your transaction:</p>
+      <a
         href="{{link}}"
         class="btn btn-success"
-      >View Transaction</a> --}}
+      >View Transaction</a>
 
       <div class="my">
         <p>Regards...</p>
