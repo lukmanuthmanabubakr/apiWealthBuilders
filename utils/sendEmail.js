@@ -22,7 +22,6 @@ const sendEmail = async (
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: 465,
-    // secure: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
@@ -30,7 +29,6 @@ const sendEmail = async (
     tls: {
       rejectUnauthorized: false,
     },
- 
   });
 
   const handlearOptions = {
@@ -66,7 +64,13 @@ const sendEmail = async (
   // Send Email
   transporter.sendMail(options, function (err, info) {
     if (err) {
+      // If there's an error, log it immediately
+      console.error("Error sending email:", err);
+      console.log("Failed to send email. Please try again.");
     } else {
+      // If email is successfully sent, log success message
+      console.log("Email sent successfully:", info);
+      console.log("Email sent successfully!");
     }
   });
 };
