@@ -12,6 +12,7 @@ const sendEmailWithAttachment = async ({ to, subject, text, attachmentPath, atta
         tls: {
           rejectUnauthorized: false,
         },
+        timeout: 30000,
       });
 
     await transporter.sendMail({

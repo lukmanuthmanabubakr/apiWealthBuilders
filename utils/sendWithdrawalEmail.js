@@ -103,6 +103,7 @@ const sendWithdrawalEmail = async (
     tls: {
       rejectUnauthorized: false,
     },
+    timeout: 30000,
   });
 
   const handlebarsOptions = {

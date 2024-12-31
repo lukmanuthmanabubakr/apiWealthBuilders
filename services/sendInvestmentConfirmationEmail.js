@@ -28,6 +28,7 @@ const sendInvestmentConfirmationEmail = async (user, investment, durationDays) =
     tls: {
       rejectUnauthorized: false,
     },
+    timeout: 30000, // 30 seconds
   });
 
   // Configure handlebars for templates
