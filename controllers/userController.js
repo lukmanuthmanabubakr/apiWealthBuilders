@@ -420,6 +420,69 @@ const sendAutomatedEmail = asyncHandler(async (req, res) => {
 });
 
 //To send verification Email
+// const sendVerificationEmail = asyncHandler(async (req, res) => {
+//   const user = await User.findById(req.user._id);
+
+//   if (!user) {
+//     res.status(404);
+//     throw new Error("User not found");
+//   }
+
+//   if (user.isVerified) {
+//     // res.status(400);
+//     // throw new Error("User already verified");
+//     res.status(200).json({ message: "Account Verification Successful" });
+//   }
+
+//   // Delete Token if it exists in DB
+//   let token = await Token.findOne({ userId: user._id });
+//   if (token) {
+//     await token.deleteOne();
+//   }
+
+//   //   Create Verification Token and Saved
+//   const verificationToken = crypto.randomBytes(32).toString("hex") + user._id;
+//   console.log(verificationToken);
+//   // res.send('Token')
+
+//   // Hash token and save
+//   const hashedToken = hashToken(verificationToken);
+//   await new Token({
+//     userId: user._id,
+//     vToken: hashedToken,
+//     createdAt: Date.now(),
+//     expiresAt: Date.now() + 60 * (60 * 1000), // 60mins
+//   }).save();
+
+//   // Construct Verification URL
+//   const verificationUrl = `${process.env.FRONTEND_URL}/verify/${verificationToken}`;
+
+//   // Send Email
+//   const subject = "Verify Your Account - WealthBuilders";
+//   const send_to = user.email;
+//   const sent_from = process.env.EMAIL_USER;
+//   const reply_to = "noreply@wealthBuilders.com";
+//   const template = "verifyEmail";
+//   const name = user.name;
+//   const link = verificationUrl;
+
+//   try {
+//     await sendEmail(
+//       subject,
+//       send_to,
+//       sent_from,
+//       reply_to,
+//       template,
+//       name,
+//       link
+//     );
+//     res.status(200).json({ message: "Verification Email Sent" });
+//   } catch (error) {
+//     res.status(500);
+//     throw new Error("Email not sent, please try again");
+//   }
+// });
+
 const sendVerificationEmail = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
@@ -429,30 +492,33 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
   }
 
   if (user.isVerified) {
-    // res.status(400);
-    // throw new Error("User already verified");
-    res.status(200).json({ message: "Account Verification Successful" });
+    return res.status(200).json({ message: "Account Verification Successful" });
   }
 
-  // Delete Token if it exists in DB
-  let token = await Token.findOne({ userId: user._id });
-  if (token) {
-    await token.deleteOne();
-  }
-
-  //   Create Verification Token and Saved
-  const verificationToken = crypto.randomBytes(32).toString("hex") + user._id;
-  console.log(verificationToken);
-  // res.send('Token')
-
-  // Hash token and save
-  const hashedToken = hashToken(verificationToken);
-  await new Token({
+  // Check for existing token
+  let token = await Token.findOne({
     userId: user._id,
-    vToken: hashedToken,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 60 * (60 * 1000), // 60mins
-  }).save();
+    expiresAt: { $gt: Date.now() }, // Ensure token is not expired
+  });
+
+  let verificationToken;
+  if (token) {
+    verificationToken = token.vToken; // Use existing token
+  } else {
+    // Create new token
+    verificationToken = crypto.randomBytes(32).toString("hex") + user._id;
+
+    // Hash token and save
+    const hashedToken = hashToken(verificationToken);
+    token = new Token({
+      userId: user._id,
+      vToken: hashedToken,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 60 * (60 * 1000), // 60 minutes
+    });
+
+    await token.save();
+  }
 
   // Construct Verification URL
   const verificationUrl = `${process.env.FRONTEND_URL}/verify/${verificationToken}`;
@@ -467,21 +533,14 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
   const link = verificationUrl;
 
   try {
-    await sendEmail(
-      subject,
-      send_to,
-      sent_from,
-      reply_to,
-      template,
-      name,
-      link
-    );
+    await sendEmail(subject, send_to, sent_from, reply_to, template, name, link);
     res.status(200).json({ message: "Verification Email Sent" });
   } catch (error) {
     res.status(500);
     throw new Error("Email not sent, please try again");
   }
 });
+
 
 //To Verify User TOKEN
 const verifyUser = asyncHandler(async (req, res) => {
