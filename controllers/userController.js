@@ -919,7 +919,7 @@ const editDepositBalance = async (req, res) => {
     }
 
     await user.save();
-    res.json({ message: "Total-profit updated successfully", updatedUser: user });
+    res.json({ message: "Balance updated successfully", updatedUser: user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
