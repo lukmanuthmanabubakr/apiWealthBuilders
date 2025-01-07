@@ -21,6 +21,7 @@ const {
   getUserTransactions,
   getReferrals,
   updateDepositBalance,
+  editDepositBalance,
 } = require("../controllers/userController");
 const {
   protect,
@@ -51,6 +52,7 @@ router.get("/dashboard", protect, verifiedOnly, getUserTransactions);
 router.get("/referrals", protect, getReferrals);
 //For admin to be able to edit user investmentbalance 
 router.put("/updateDepositBalance/:id", protect, authorOnly, updateDepositBalance);
+router.put("/editDepositBalance/:id", protect, authorOnly, editDepositBalance);
 
 
 
