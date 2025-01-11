@@ -10,6 +10,9 @@ const investmentRoutes = require("./routes/investmentRoutes");
 const withDrawRoutes = require("./routes/withdrawRoutes");
 const errorHandler = require("./middleware/errorMiddleware");
 const seedPlans = require("./utils/seedInvestmentPlans");
+const countriesRoutes = require("./routes/countriesRoutes");
+
+
 
 const app = express();
 
@@ -36,6 +39,8 @@ app.use("/api/users", userRoute);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/invest", investmentRoutes);
 app.use("/api/withDraw", withDrawRoutes);
+app.use("/api", countriesRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("Home Page");

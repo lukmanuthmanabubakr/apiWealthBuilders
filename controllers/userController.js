@@ -5,6 +5,7 @@ const { generateToken, hashToken } = require("../utils");
 var parser = require("ua-parser-js");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../utils/sendEmail");
+const countries = require("../data/countries.json");
 const Token = require("../models/tokenModel");
 const crypto = require("crypto");
 const Cryptr = require("cryptr");
@@ -21,10 +22,10 @@ const generateReferralCode = (userId) => {
 
 //To Register User
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, referralCode, phone } = req.body;
+  const { name, email, password, referralCode, phone, country } = req.body;
 
   // Validation
-  if (!name || !email || !password || !phone) {
+  if (!name || !email || !password || !phone || !country) {
     res.status(400);
     throw new Error("Please fill in all the required fields.");
   }
@@ -34,15 +35,21 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Password must be up to 6 characters.");
   }
 
+  // Check if country is valid
+  const isValidCountry = countries.some((c) => c.name === country);
+  if (!isValidCountry) {
+    res.status(400);
+    throw new Error("Invalid country selection.");
+  }
+
   // Check if user exists
   const userExists = await User.findOne({ email });
-
   if (userExists) {
     res.status(400);
     throw new Error("Email already in use.");
   }
-  const phoneExist = await User.findOne({ phone });
 
+  const phoneExist = await User.findOne({ phone });
   if (phoneExist) {
     res.status(400);
     throw new Error("Phone Number already in use.");
@@ -58,6 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
     password,
     phone,
     userAgent,
+    country,
     balance: 5,
     referralCode: generateReferralCode(email),
   });
@@ -95,6 +103,7 @@ const registerUser = asyncHandler(async (req, res) => {
       photo,
       role,
       isVerified,
+      country,
       referralCode,
     } = user;
 
@@ -107,6 +116,7 @@ const registerUser = asyncHandler(async (req, res) => {
       photo,
       role,
       isVerified,
+      country,
       referralCode,
       token,
     });
@@ -216,6 +226,7 @@ const loginUser = asyncHandler(async (req, res) => {
       bio,
       photo,
       role,
+      country,
       isVerified,
       referralCode,
     } = user;
@@ -228,6 +239,7 @@ const loginUser = asyncHandler(async (req, res) => {
       bio,
       photo,
       role,
+      country,
       isVerified,
       token,
       referralCode,
@@ -263,6 +275,7 @@ const getUser = asyncHandler(async (req, res) => {
       bio,
       photo,
       role,
+      country,
       isVerified,
       referralCode,
       balance,
@@ -278,6 +291,7 @@ const getUser = asyncHandler(async (req, res) => {
       bio,
       photo,
       role,
+      country,
       isVerified,
       referralCode,
       balance,
@@ -295,10 +309,11 @@ const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
-    const { name, email, phone, bio, photo, role, isVerified } = user;
+    const { name, email, phone, bio, photo, role, isVerified, country  } = user;
 
     user.email = email;
     user.name = req.body.name || name;
+    user.country = req.body.country || country;
     user.phone = req.body.phone || phone;
     user.bio = req.body.bio || bio;
     user.photo = req.body.photo || photo;
@@ -308,6 +323,7 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(200).json({
       _id: updatedUser._id,
       name: updatedUser.name,
+      country: updatedUser.country,
       email: updatedUser.email,
       phone: updatedUser.phone,
       bio: updatedUser.bio,

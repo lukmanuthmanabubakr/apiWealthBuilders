@@ -33,7 +33,6 @@ const userSchema = mongoose.Schema(
       trim: true,
       match: [/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"],
     },
-
     bio: {
       type: String,
       default: "bio",
@@ -42,7 +41,6 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       default: "subscriber",
-      // subscriber, author, admin (suspended)
     },
     isVerified: {
       type: Boolean,
@@ -53,9 +51,13 @@ const userSchema = mongoose.Schema(
       required: true,
       default: [],
     },
+    country: {
+      type: String,
+      required: [true, "Please select a country"],
+    },
     balance: {
       type: Number,
-      default: 0, // start balance at 0 for new users
+      default: 0,
     },
     referralCode: { type: String, unique: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -73,7 +75,7 @@ const userSchema = mongoose.Schema(
   }
 );
 
-// Encrypt password before saving to DB
+// Remove this middleware to prevent password hashing
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
