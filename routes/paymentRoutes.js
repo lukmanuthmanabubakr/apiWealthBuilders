@@ -8,7 +8,7 @@ const {
   } = require("../middleware/authMiddleware");
 
 
-// Route to create a transaction (user submits a payment)
+// Route to create a transaction (user submits a payment);
 router.post("/create", protect, verifiedOnly, createTransaction);
 
 // Route to confirm a payment (admin confirms payment)
