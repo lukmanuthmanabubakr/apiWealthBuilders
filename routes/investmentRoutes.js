@@ -6,8 +6,12 @@ const {
   investmentHistory,
   checkAndDepositMaturityAmounts,
   getTransactionHistory,
+  approveInvestment,
+  rejectInvestment,
+  getInvestmentDetails,
+  adminPendingInvestment,
 } = require("../controllers/investmentController");
-const { protect, verifiedOnly } = require("../middleware/authMiddleware");
+const { protect, verifiedOnly, adminOnly } = require("../middleware/authMiddleware");
 const InvestmentPlan = require("../models/InvestmentPlan");
 
 const router = express.Router();
@@ -15,6 +19,11 @@ const router = express.Router();
 
 // Route to start an investment
 router.post("/start-invest", protect, verifiedOnly, startInvestment);
+router.put("/:investmentId/approve", approveInvestment);
+
+// Reject investment route
+router.put("/:investmentId/reject", rejectInvestment);
+
 router.get(
   "/total-investment",
   protect,
@@ -30,6 +39,10 @@ router.get(
 );
 router.get("/deposit-maturity", protect, verifiedOnly, checkAndDepositMaturityAmounts);
 router.get("/getTransactionHistory", protect, verifiedOnly, getTransactionHistory);
+router.get("/investments/:investmentId", getInvestmentDetails);
+router.get("/adminPendingInvestment", protect, verifiedOnly, adminOnly, adminPendingInvestment);
+
+
 
 
 

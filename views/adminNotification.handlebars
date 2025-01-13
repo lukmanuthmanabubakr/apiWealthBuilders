@@ -1,0 +1,37 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Investment Approval</title>
+    <style>
+      body { background-color: #f0f0f0; /* Light Gray */ padding: 30px;
+      font-family: Arial, Helvetica, sans-serif; } .container {
+      background-color: #2f4f4f; /* Dark Gray */ padding: 20px; border-radius:
+      6px; color: #f0f7f4; /* Light Gray */ } h2 { color: #f0f7f4; /* Dark Navy
+      Blue */ } p { margin: 0.5rem 0; line-height: 1.6; } ul { list-style: none;
+      padding: 0; } ul li { margin: 0.5rem 0; color: #ffffff; /* Light Green */
+      } a { display: inline-block; margin-top: 1rem; font-size: 1.2rem;
+      text-decoration: none; color: #ffffff; background-color: #4682b4; /* Steel
+      Blue */ padding: 10px 15px; border-radius: 4px; transition: background
+      0.3s ease; } a:hover { background-color: #1e90ff; /* Dodger Blue */ }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Investment Approval Required</h2>
+      <p>A new investment requires your approval:</p>
+      <ul>
+        <li><strong>User:</strong> {{userName}} ({{userEmail}})</li>
+        <li><strong>Investment Plan:</strong> {{plan}}</li>
+        <li><strong>Amount:</strong> ${{amount}}</li>
+        <li><strong>Start Date:</strong> {{startDate}}</li>
+        <li><strong>End Date:</strong> {{endDate}}</li>
+        <li><strong>Maturity Amount:</strong> ${{maturityAmount}}</li>
+      </ul>
+      <p>
+        <a href="https://www.wealtybuilders.com/admin-pending-investment">Approve or Reject Investment</a>
+      </p>
+    </div>
+  </body>
+</html>

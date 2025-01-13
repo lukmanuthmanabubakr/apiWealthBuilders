@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Investment Approved</title>
+  <title>Investment Not Approved</title>
   <style>
     body {
       background-color: #f0f0f0; /* Light Gray */
@@ -18,34 +18,34 @@
       color: #f0f7f4; /* Light Gray */
     }
     .header {
-      color: #87ea88; /* Light Green */
+      color: #f0f7f4; /* Red */
     }
     ul {
       list-style-type: none;
       padding: 0;
     }
     strong {
-      color: #4682b4; /* Steel Blue */
+      color: #87ea88; /* Light Green */
     }
     a {
       display: inline-block;
       margin-top: 20px;
       padding: 10px 20px;
-      background-color: #4682b4; /* Steel Blue */
+      background-color: #ff4d4f; /* Red */
       color: #ffffff; /* White */
       text-decoration: none;
       border-radius: 4px;
       font-weight: bold;
     }
     a:hover {
-      background-color: #376a8a; /* Darker Steel Blue */
+      background-color: #e43e3e; /* Darker Red */
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 class="header">Congratulations, {{userName}}!</h1>
-    <p>Your investment has been approved:</p>
+    <h1 class="header">Hello, {{userName}}</h1>
+    <p>We regret to inform you that your investment was not approved:</p>
     <ul>
       <li><strong>Investment Plan:</strong> {{plan}}</li>
       <li><strong>Amount:</strong> ${{amount}}</li>
@@ -53,8 +53,8 @@
       <li><strong>End Date:</strong> {{endDate}}</li>
       <li><strong>Maturity Amount:</strong> ${{maturityAmount}}</li>
     </ul>
-    <p>Thank you for choosing us for your investment journey!</p>
-    <a href="{{link}}">View Investment</a>
+    <p>If you have any questions, feel free to contact us for assistance.</p>
+    <a href="https://www.wealtybuilders.com/contact">Contact Support</a>
   </div>
 </body>
 </html>
