@@ -173,7 +173,7 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
 
-  // Trigger 2FA for unknow UserAgent
+  // Trigger 2FA for UserAgent
   const ua = parser(req.headers["user-agent"]);
   const thisUserAgent = ua.ua;
   console.log(thisUserAgent);
