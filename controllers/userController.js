@@ -703,7 +703,7 @@ const sendLoginCode = asyncHandler(async (req, res) => {
   }
 });
 
-//For User to login with code
+//For User with code
 const loginWithCode = asyncHandler(async (req, res) => {
   const { email } = req.params;
   const { loginCode } = req.body;
