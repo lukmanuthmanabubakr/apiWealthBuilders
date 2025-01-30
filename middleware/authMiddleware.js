@@ -59,9 +59,42 @@ const adminOnly = asyncHandler(async (req, res, next) => {
   }
 });
 
+const kycApprovedOnly = asyncHandler(async (req, res, next) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+
+  // Check if KYC is not submitted yet
+  if (user.kycStatus === "Not Submitted") {
+    res.status(400);
+    throw new Error("Please complete your KYC verification to continue");
+  }
+
+  // Check if KYC is pending (document submission is under review)
+  if (user.kycStatus === "Pending") {
+    res.status(400);
+    throw new Error("Your KYC is under review. Please wait for approval.");
+  }
+
+  // Check the individual document status (kyc.status)
+  if (user.kyc.status === "Rejected") {
+    res.status(400);
+    throw new Error("Your KYC submission has been rejected. Please resubmit.");
+  }
+  if (req.user && req.user.kyc && req.user.kyc.status === "Approved") {
+    next();
+  } else {
+    res.status(403);
+    throw new Error(
+      "Access denied. Your KYC documents have not been approved yet."
+    );
+  }
+});
+
 module.exports = {
   protect,
   verifiedOnly,
   authorOnly,
   adminOnly,
+  kycApprovedOnly,
 };

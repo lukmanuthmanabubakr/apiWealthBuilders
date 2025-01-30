@@ -59,6 +59,20 @@ const userSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    kycStatus: {
+      type: String,
+      enum: ['Not Submitted', 'Pending', 'Approved', 'Rejected'],
+      default: 'Not Submitted', // Default status when user registers
+    },
+    kyc: {
+      frontDoc: { type: String }, // Path to front document
+      backDoc: { type: String }, // Path to back document
+      status: {
+        type: String,
+        enum: ["Pending", "Approved", "Rejected"],
+        default: "Pending", // Default KYC status after submission
+      },
+    },
     referralCode: { type: String, unique: true },
     referredBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     referrals: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
@@ -75,7 +89,7 @@ const userSchema = mongoose.Schema(
   }
 );
 
-// Remove this middleware to prevent password hashing
+// Middleware to hash password before saving user
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();

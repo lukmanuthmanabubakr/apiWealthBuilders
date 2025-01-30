@@ -10,7 +10,7 @@ const Token = require("../models/tokenModel");
 const crypto = require("crypto");
 const Cryptr = require("cryptr");
 
-// const 
+// const
 
 const cryptr = new Cryptr(process.env.CRYPTR_KEY);
 
@@ -66,7 +66,7 @@ const registerUser = asyncHandler(async (req, res) => {
     phone,
     userAgent,
     country,
-    balance: 5,
+    balance: 0,
     referralCode: generateReferralCode(email),
   });
 
@@ -172,7 +172,6 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new Error("Account suspended, please contact support");
   }
 
-
   // Trigger 2FA for UserAgent
   const ua = parser(req.headers["user-agent"]);
   const thisUserAgent = ua.ua;
@@ -277,6 +276,7 @@ const getUser = asyncHandler(async (req, res) => {
       role,
       country,
       isVerified,
+      kycStatus,
       referralCode,
       balance,
       investmentBalance,
@@ -293,6 +293,7 @@ const getUser = asyncHandler(async (req, res) => {
       role,
       country,
       isVerified,
+      kycStatus,
       referralCode,
       balance,
       investmentBalance,
@@ -309,7 +310,7 @@ const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
-    const { name, email, phone, bio, photo, role, isVerified, country  } = user;
+    const { name, email, phone, bio, photo, role, isVerified, country } = user;
 
     user.email = email;
     user.name = req.body.name || name;
@@ -499,7 +500,6 @@ const sendVerificationEmail = asyncHandler(async (req, res) => {
   }
 });
 
-
 //To Verify User TOKEN
 const verifyUser = asyncHandler(async (req, res) => {
   const { verificationToken } = req.params;
@@ -527,12 +527,11 @@ const verifyUser = asyncHandler(async (req, res) => {
 
   // Now verify user
   user.isVerified = true;
+  user.balance += 5;
   await user.save();
 
   res.status(200).json({ message: "Account Verification Successful" });
 });
-
-
 
 //Forgot password
 const forgotPassword = asyncHandler(async (req, res) => {
@@ -859,7 +858,7 @@ const loginWithGoogle = asyncHandler(async (req, res) => {
 });
 
 const getUserTransactions = async (req, res) => {
-  const userId = req.user._id; 
+  const userId = req.user._id;
   try {
     const transactions = await Transaction.find({ userId }).populate(
       "userId",
@@ -877,7 +876,6 @@ const getUserTransactions = async (req, res) => {
       .json({ message: "Failed to retrieve transactions." });
   }
 };
-
 
 const updateDepositBalance = async (req, res) => {
   const { id } = req.params; // User ID
@@ -904,7 +902,10 @@ const updateDepositBalance = async (req, res) => {
     }
 
     await user.save();
-    res.json({ message: "Total-profit updated successfully", updatedUser: user });
+    res.json({
+      message: "Total-profit updated successfully",
+      updatedUser: user,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -941,6 +942,198 @@ const editDepositBalance = async (req, res) => {
   }
 };
 
+const uploadKycDocuments = asyncHandler(async (req, res) => {
+  try {
+    // Ensure the user is authenticated
+    const userId = req.user.id;
+
+    // Fetch user from the database
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    // Prevent re-upload if KYC is still pending
+    if (user.kycStatus === "Pending") {
+      res.status(400);
+      throw new Error(
+        "You have already submitted your KYC documents. Please wait for approval."
+      );
+    }
+
+    // Check if required files are provided
+    if (!req.files || !req.files.front || !req.files.back) {
+      res.status(400);
+      throw new Error(
+        "Please upload both the front and back of your document."
+      );
+    }
+
+    // Paths of the uploaded files
+    const frontDocPath = req.files.front[0].path;
+    const backDocPath = req.files.back[0].path;
+
+    // Convert the file paths to public URLs
+    const baseUrl = process.env.BASE_IMG_URL;
+    const frontDocUrl = `${baseUrl}/${frontDocPath.replace(/\\/g, "/")}`;
+    const backDocUrl = `${baseUrl}/${backDocPath.replace(/\\/g, "/")}`;
+
+    // Update the user's KYC field and status in the database
+    user.kyc = {
+      frontDoc: frontDocUrl,
+      backDoc: backDocUrl,
+      status: "Pending",
+    };
+    user.kycStatus = "Pending";
+
+    await user.save();
+
+    console.log("KYC Status being sent:", user.kycStatus);
+
+
+    const adminEmail = process.env.ADMIN_EMAIL || "invest@wealtybuilders.com";
+    await sendEmail(
+      "New KYC Submission",
+      adminEmail,
+      process.env.EMAIL_USER, // Sent from
+      process.env.EMAIL_USER, // Reply-to
+      "kyc-notification", // Name of the handlebars template
+      user.name, // User's name
+      user.kycStatus
+    );
+
+    res.status(200).json({
+      message: "KYC documents uploaded successfully!",
+      kyc: user.kyc,
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(`Error uploading KYC documents: ${error.message}`);
+  }
+});
+
+const getPendingKycRequests = asyncHandler(async (req, res) => {
+  try {
+    // Find all users with KYC status as Pending
+    const pendingUsers = await User.find({ kycStatus: "Pending" });
+
+    if (pendingUsers.length === 0) {
+      return res.status(404).json({ message: "No pending KYC requests" });
+    }
+
+    res.status(200).json({
+      message: "Pending KYC requests fetched successfully",
+      pendingUsers,
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(`Error fetching pending KYC requests: ${error.message}`);
+  }
+});
+
+
+// Approve KYC request for a specific user
+const approveKycRequest = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Find user by ID and ensure the KYC status is "Pending"
+    const user = await User.findById(userId);
+
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    if (user.kycStatus !== "Pending") {
+      res.status(400);
+      throw new Error("KYC is not pending for this user");
+    }
+
+    // Update KYC status to "Approved"
+    user.kycStatus = "Approved";
+    user.kyc.status = "Approved"; // Update the individual document status
+
+    await user.save();
+
+    console.log("KYC Status being update to:", user.kycStatus);
+
+
+    // Send KYC approval email
+    await sendEmail(
+      "Your KYC Verification is Approved",
+      user.email,
+      process.env.EMAIL_USER,
+      process.env.EMAIL_USER,
+      "emails/kyc-approved", // Correct path to the template
+      user.name
+    );
+    
+    
+    res.status(200).json({
+      message: "KYC request approved successfully",
+      kyc: user.kyc, // Return updated KYC details
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(`Error approving KYC request: ${error.message}`);
+  }
+});
+
+// Reject KYC request for a specific user
+const rejectKycRequest = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Find user by ID and ensure the KYC status is "Pending"
+    const user = await User.findById(userId);
+
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    if (user.kycStatus !== "Pending") {
+      res.status(400);
+      throw new Error("KYC is not pending for this user");
+    }
+
+    // Update KYC status to "Rejected"
+    user.kycStatus = "Rejected";
+    user.kyc.status = "Rejected"; // Update the individual document status
+
+    await user.save();
+    console.log("KYC Status being updated to:", user.kycStatus);
+
+
+    // Send KYC rejection email
+    await sendEmail(
+      "Your KYC Verification is Rejected",
+      user.email,
+      process.env.EMAIL_USER,
+      process.env.EMAIL_USER,
+      "emails/kyc-rejected", // Correct path to the template
+      user.name
+    );
+    
+
+    res.status(200).json({
+      message: "KYC request rejected successfully",
+      kyc: user.kyc, // Return updated KYC details
+    });
+  } catch (error) {
+    res.status(500);
+    throw new Error(`Error rejecting KYC request: ${error.message}`);
+  }
+});
+
+
+
+
+
+
+
 module.exports = {
   registerUser,
   loginUser,
@@ -964,6 +1157,10 @@ module.exports = {
   getReferrals,
   updateDepositBalance,
   editDepositBalance,
+  uploadKycDocuments,
+  getPendingKycRequests,
+  approveKycRequest,
+  rejectKycRequest,
 };
 
 // res.send('Log out user')

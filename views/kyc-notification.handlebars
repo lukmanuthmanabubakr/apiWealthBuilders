@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>New KYC Submission</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: start;
+      margin: auto;
+    }
+    h2 {
+      color: #1e90ff;
+      margin-bottom: 15px;
+    }
+    p {
+      color: #333333;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .kyc-status {
+      font-weight: bold;
+      color: #1e90ff;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #777777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>New KYC Submission</h2>
+    <p>Hello Admin,</p>
+    <p>A new KYC submission has been made by <strong>{{name}}</strong>.</p>
+    <p><strong>KYC Status:</strong> <span class="kyc-status">Pending</span></p>
+    <p>Please review and approve or reject the submission.</p>
+    <br />
+    <p class="footer">Best regards,<br>Your Team</p>
+  </div>
+</body>
+</html>
