@@ -1,28 +1,21 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("./cloudinary"); // Import Cloudinary config
 
-// Ensure the uploads/kyc directory exists
-const kycDir = "uploads/kyc";
-if (!fs.existsSync(kycDir)) {
-  fs.mkdirSync(kycDir, { recursive: true });
-}
-
-// Set up storage engine
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, kycDir); // Directory where files will be stored
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
+// Configure Cloudinary Storage for Multer
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "kyc_documents", // Folder in Cloudinary
+    format: async (req, file) => "png", // Convert all uploads to PNG
+    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
   },
 });
 
 // File filter to allow only images and PDFs
 const fileFilter = (req, file, cb) => {
   const allowedFileTypes = /jpeg|jpg|png|pdf/;
-  const extname = allowedFileTypes.test(path.extname(file.originalname).toLowerCase());
+  const extname = allowedFileTypes.test(file.originalname.toLowerCase());
   const mimetype = allowedFileTypes.test(file.mimetype);
 
   if (extname && mimetype) {

@@ -942,9 +942,79 @@ const editDepositBalance = async (req, res) => {
   }
 };
 
+// const uploadKycDocuments = asyncHandler(async (req, res) => {
+//   try {
+//     // Ensure the user is authenticated
+//     const userId = req.user.id;
+
+//     // Fetch user from the database
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       res.status(404);
+//       throw new Error("User not found");
+//     }
+
+//     // Prevent re-upload if KYC is still pending
+//     if (user.kycStatus === "Pending") {
+//       res.status(400);
+//       throw new Error(
+//         "You have already submitted your KYC documents. Please wait for approval."
+//       );
+//     }
+
+//     // Check if required files are provided
+//     if (!req.files || !req.files.front || !req.files.back) {
+//       res.status(400);
+//       throw new Error(
+//         "Please upload both the front and back of your document."
+//       );
+//     }
+
+//     // Paths of the uploaded files
+//     const frontDocPath = req.files.front[0].path;
+//     const backDocPath = req.files.back[0].path;
+
+//     // Convert the file paths to public URLs
+//     const baseUrl = process.env.BASE_IMG_URL;
+//     const frontDocUrl = `${baseUrl}/${frontDocPath.replace(/\\/g, "/")}`;
+//     const backDocUrl = `${baseUrl}/${backDocPath.replace(/\\/g, "/")}`;
+
+//     // Update the user's KYC field and status in the database
+//     user.kyc = {
+//       frontDoc: frontDocUrl,
+//       backDoc: backDocUrl,
+//       status: "Pending",
+//     };
+//     user.kycStatus = "Pending";
+
+//     await user.save();
+
+//     console.log("KYC Status being sent:", user.kycStatus);
+
+
+//     const adminEmail = process.env.ADMIN_EMAIL || "invest@wealtybuilders.com";
+//     await sendEmail(
+//       "New KYC Submission",
+//       adminEmail,
+//       process.env.EMAIL_USER, // Sent from
+//       process.env.EMAIL_USER, // Reply-to
+//       "kyc-notification", // Name of the handlebars template
+//       user.name, // User's name
+//       user.kycStatus
+//     );
+
+//     res.status(200).json({
+//       message: "KYC documents uploaded successfully!",
+//       kyc: user.kyc,
+//     });
+//   } catch (error) {
+//     res.status(500);
+//     throw new Error(`Error uploading KYC documents: ${error.message}`);
+//   }
+// });
+
 const uploadKycDocuments = asyncHandler(async (req, res) => {
   try {
-    // Ensure the user is authenticated
     const userId = req.user.id;
 
     // Fetch user from the database
@@ -954,32 +1024,20 @@ const uploadKycDocuments = asyncHandler(async (req, res) => {
       throw new Error("User not found");
     }
 
-    // Prevent re-upload if KYC is still pending
     if (user.kycStatus === "Pending") {
       res.status(400);
-      throw new Error(
-        "You have already submitted your KYC documents. Please wait for approval."
-      );
+      throw new Error("You have already submitted your KYC documents. Please wait for approval.");
     }
 
-    // Check if required files are provided
     if (!req.files || !req.files.front || !req.files.back) {
       res.status(400);
-      throw new Error(
-        "Please upload both the front and back of your document."
-      );
+      throw new Error("Please upload both the front and back of your document.");
     }
 
-    // Paths of the uploaded files
-    const frontDocPath = req.files.front[0].path;
-    const backDocPath = req.files.back[0].path;
+    // Cloudinary automatically returns a URL for the uploaded files
+    const frontDocUrl = req.files.front[0].path; 
+    const backDocUrl = req.files.back[0].path; 
 
-    // Convert the file paths to public URLs
-    const baseUrl = process.env.BASE_IMG_URL;
-    const frontDocUrl = `${baseUrl}/${frontDocPath.replace(/\\/g, "/")}`;
-    const backDocUrl = `${baseUrl}/${backDocPath.replace(/\\/g, "/")}`;
-
-    // Update the user's KYC field and status in the database
     user.kyc = {
       frontDoc: frontDocUrl,
       backDoc: backDocUrl,
@@ -991,15 +1049,15 @@ const uploadKycDocuments = asyncHandler(async (req, res) => {
 
     console.log("KYC Status being sent:", user.kycStatus);
 
-
+    // Send notification email
     const adminEmail = process.env.ADMIN_EMAIL || "invest@wealtybuilders.com";
     await sendEmail(
       "New KYC Submission",
       adminEmail,
-      process.env.EMAIL_USER, // Sent from
-      process.env.EMAIL_USER, // Reply-to
-      "kyc-notification", // Name of the handlebars template
-      user.name, // User's name
+      process.env.EMAIL_USER,
+      process.env.EMAIL_USER,
+      "kyc-notification",
+      user.name,
       user.kycStatus
     );
 
@@ -1012,6 +1070,8 @@ const uploadKycDocuments = asyncHandler(async (req, res) => {
     throw new Error(`Error uploading KYC documents: ${error.message}`);
   }
 });
+
+
 
 const getPendingKycRequests = asyncHandler(async (req, res) => {
   try {
