@@ -171,8 +171,9 @@ const sendEmail = async (
 
     return emailResponse;
   } catch (err) {
+    console.error("Email sending error:", err);
     throw new Error(err.message || "Something went wrong");
-  }
+      }
 };
 
 module.exports = sendEmail;
