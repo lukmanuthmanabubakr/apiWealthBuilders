@@ -168,6 +168,7 @@ const sendEmail = async (
 
     // Send Email
     const emailResponse = await transporter.sendMail(options);
+    console.log(emailResponse)
 
     return emailResponse;
   } catch (err) {

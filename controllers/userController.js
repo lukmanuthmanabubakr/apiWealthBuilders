@@ -145,6 +145,110 @@ const getReferrals = asyncHandler(async (req, res) => {
 });
 
 //To Login User
+// const loginUser = asyncHandler(async (req, res) => {
+//   const { email, password } = req.body;
+
+//   //   Validation
+//   if (!email || !password) {
+//     res.status(400);
+//     throw new Error("Please add email and password");
+//   }
+
+//   const user = await User.findOne({ email });
+
+//   if (!user) {
+//     res.status(404);
+//     throw new Error("User not found, please signup");
+//   }
+
+//   const passwordIsCorrect = await bcrypt.compare(password, user.password);
+
+//   if (!passwordIsCorrect) {
+//     res.status(400);
+//     throw new Error("Invalid email or password");
+//   }
+//   if (user.role === "suspended") {
+//     res.status(401);
+//     throw new Error("Account suspended, please contact support");
+//   }
+
+//   // Trigger 2FA for UserAgent
+//   const ua = parser(req.headers["user-agent"]);
+//   const thisUserAgent = ua.ua;
+//   console.log(thisUserAgent);
+//   const allowedAgent = user.userAgent.includes(thisUserAgent);
+
+//   if (!allowedAgent) {
+//     // Genrate 6 digit code
+//     const loginCode = Math.floor(100000 + Math.random() * 900000);
+//     console.log(loginCode);
+
+//     // Encrypt login code before saving to DB
+//     const encryptedLoginCode = cryptr.encrypt(loginCode.toString());
+
+//     // Delete the user Token if it exists in DB
+//     let userToken = await Token.findOne({ userId: user._id });
+//     if (userToken) {
+//       await userToken.deleteOne();
+//     }
+
+//     // Save Token to DB
+//     await new Token({
+//       userId: user._id,
+//       lToken: encryptedLoginCode,
+//       createdAt: Date.now(),
+//       expiresAt: Date.now() + 60 * (60 * 1000), // just 60mins
+//     }).save();
+
+//     res.status(400);
+//     throw new Error("New browser or device detected");
+//   }
+
+//   // Generate Token
+//   const token = generateToken(user._id);
+
+//   if (user && passwordIsCorrect) {
+//     // Send HTTP-only cookie
+//     res.cookie("token", token, {
+//       path: "/",
+//       httpOnly: true,
+//       expires: new Date(Date.now() + 1000 * 86400), // 1 day
+//       sameSite: "none",
+//       secure: true,
+//     });
+
+//     const {
+//       _id,
+//       name,
+//       email,
+//       phone,
+//       bio,
+//       photo,
+//       role,
+//       country,
+//       isVerified,
+//       referralCode,
+//     } = user;
+
+//     res.status(200).json({
+//       _id,
+//       name,
+//       email,
+//       phone,
+//       bio,
+//       photo,
+//       role,
+//       country,
+//       isVerified,
+//       token,
+//       referralCode,
+//     });
+//   } else {
+//     res.status(500);
+//     throw new Error("Something went wrong, please try again");
+//   }
+// });
+
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -167,41 +271,10 @@ const loginUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Invalid email or password");
   }
+
   if (user.role === "suspended") {
     res.status(401);
     throw new Error("Account suspended, please contact support");
-  }
-
-  // Trigger 2FA for UserAgent
-  const ua = parser(req.headers["user-agent"]);
-  const thisUserAgent = ua.ua;
-  console.log(thisUserAgent);
-  const allowedAgent = user.userAgent.includes(thisUserAgent);
-
-  if (!allowedAgent) {
-    // Genrate 6 digit code
-    const loginCode = Math.floor(100000 + Math.random() * 900000);
-    console.log(loginCode);
-
-    // Encrypt login code before saving to DB
-    const encryptedLoginCode = cryptr.encrypt(loginCode.toString());
-
-    // Delete the user Token if it exists in DB
-    let userToken = await Token.findOne({ userId: user._id });
-    if (userToken) {
-      await userToken.deleteOne();
-    }
-
-    // Save Token to DB
-    await new Token({
-      userId: user._id,
-      lToken: encryptedLoginCode,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 60 * (60 * 1000), // just 60mins
-    }).save();
-
-    res.status(400);
-    throw new Error("New browser or device detected");
   }
 
   // Generate Token
@@ -248,6 +321,7 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new Error("Something went wrong, please try again");
   }
 });
+
 
 //To Log-out User
 const logoutUser = asyncHandler(async (req, res) => {
