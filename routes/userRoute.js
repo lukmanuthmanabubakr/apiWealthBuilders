@@ -37,6 +37,8 @@ const {
 const router = express.Router();
 const upload = require("../utils/fileUpload"); // Import the file upload middleware
 
+const { impersonateUser, exitImpersonation } = require("../controllers/adminController");
+
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
@@ -62,6 +64,8 @@ router.get("/referrals", protect, getReferrals);
 //For admin to be able to edit user investmentbalance 
 router.put("/updateDepositBalance/:id", protect, authorOnly, updateDepositBalance);
 router.put("/editDepositBalance/:id", protect, authorOnly, editDepositBalance);
+router.post("/impersonate/:userId", protect, adminOnly, impersonateUser);
+router.post("/exit-impersonation", protect, exitImpersonation);
 
 
 

@@ -355,6 +355,8 @@ const getUser = asyncHandler(async (req, res) => {
       balance,
       investmentBalance,
       totalMaturityAmount,
+      isImpersonated
+
     } = user;
 
     res.status(200).json({
@@ -372,6 +374,7 @@ const getUser = asyncHandler(async (req, res) => {
       balance,
       investmentBalance,
       totalMaturityAmount,
+      isImpersonated
     });
   } else {
     res.status(404);

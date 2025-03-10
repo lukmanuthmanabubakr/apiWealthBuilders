@@ -81,6 +81,7 @@ const userSchema = mongoose.Schema(
       required: true,
       default: 0,
     },
+    isImpersonated: { type: Boolean, default: false },
     totalMaturityAmount: { type: Number, default: 0 },
   },
   {
