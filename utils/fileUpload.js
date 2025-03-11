@@ -14,14 +14,14 @@ const storage = new CloudinaryStorage({
 
 // File filter to allow only images and PDFs
 const fileFilter = (req, file, cb) => {
-  const allowedFileTypes = /jpeg|jpg|png|pdf/;
+  const allowedFileTypes = /jpeg|jpg|png|gif|webp|bmp|heic|pdf/;
   const extname = allowedFileTypes.test(file.originalname.toLowerCase());
   const mimetype = allowedFileTypes.test(file.mimetype);
 
   if (extname && mimetype) {
     cb(null, true);
   } else {
-    cb(new Error("Only .jpeg, .jpg, .png, and .pdf files are allowed"));
+    cb(new Error("Only .jpeg, .jpg, .png, .gif, .webp, .bmp, .heic, and .pdf files are allowed"));
   }
 };
 
